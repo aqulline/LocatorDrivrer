@@ -49,7 +49,7 @@ ScreenManager:
                         md_bg_color:.35, .35, .35, 1
                         text_color: 36/255, 146/255, 255/255, 1
                         on_release:
-                            app.fetch_location()
+                            app.start()
                     MDLabel:
                         font_style:"Body1"
                         text:"Start Monitoring"
@@ -74,7 +74,7 @@ ScreenManager:
                         theme_text_color: "Custom"
                         font_name: 'components/fonts/Gill Sans.otf'
                         text_color: 1, 1, 1, 1
-                        pos_hint:{"center_x":.18,"center_y":.67}
+                        pos_hint:{"center_x":.22,"center_y":.67}
                     MDLabel:
                         text:"Latitude:"
                         halign:"center"

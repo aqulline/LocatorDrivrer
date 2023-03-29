@@ -1,5 +1,6 @@
 import json
 from firebase_db import FireBase as FB
+from beem import sms as SM
 
 
 class Database:
@@ -19,7 +20,14 @@ class Database:
     def current_pos(self, prev, current):
         idd = "T657"
         FB.prev_current(FB(), idd, prev, current)
+        self.send_sms(current)
 
+    def send_sms(self, current):
+        num = FB.get_number(FB(), current)
+
+        if num:
+            for i in num:
+                SM.send_sms(i, f"Marangu imefika {current} kwa sasa")
     def bus_list(self):
         with open("database/stops.json") as expenses:
             exp = json.load(expenses)

@@ -5,11 +5,12 @@ from kivy.base import EventLoop
 from kivymd.app import MDApp
 from kivy.core.window import Window
 from kivy.clock import Clock, mainthread
-from kivy import utils
+from kivy import utils, platform
 from kivymd.toast import toast
 from kivymd.uix.bottomsheet import MDListBottomSheet
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.tab import MDTabsBase
+from plyer import gps
 
 from database import Database as DT
 
@@ -55,6 +56,7 @@ class MainApp(MDApp):
     def on_start(self):
         self.add_bus()
         self.keyboard_hooker()
+        self.gps_init()
 
     def keyboard_hooker(self, *args):
         EventLoop.window.bind(on_keyboard=self.hook_keyboard)
@@ -172,6 +174,60 @@ class MainApp(MDApp):
         self.screens_size = len(self.screens) - 1
         self.current = self.screens[len(self.screens) - 1]
         self.screen_capture(self.current)
+
+
+    def request_android_permissions(self):
+        from android.permissions import request_permissions, Permission
+
+        def callback(permissions, results):
+            if all([res for res in results]):
+                print("callback. All permissions granted.")
+            else:
+                print("callback. Some permissions refused.")
+
+        request_permissions([Permission.ACCESS_COARSE_LOCATION,
+                             Permission.ACCESS_FINE_LOCATION, Permission.CALL_PHONE], callback)
+
+    @mainthread
+    def gps_init(self):
+        try:
+            gps.configure(on_location=self.on_location,
+                          on_status=self.on_status)
+
+        except NotImplementedError:
+            import traceback
+            traceback.print_exc()
+            gps_status = 'GPS is not implemented for your platform'
+
+            return gps_status
+
+        if platform == "android":
+            print("gps.py: Android detected. Requesting permissions")
+            self.request_android_permissions()
+
+    @mainthread
+    def start(self, minTime=1000, minDistance=1):
+        gps.start(minTime, minDistance)
+        toast("GPS Running...")
+
+    @mainthread
+    def stop(self):
+        gps.stop()
+
+    @mainthread
+    def on_location(self, **kwargs):
+        self.gps_location = '\n'.join([
+            '{}={}'.format(k, v) for k, v in kwargs.items()])
+
+        toast("geting location.....")
+
+        self.lat = float(kwargs["lat"])
+        self.lon = float(kwargs["lon"])
+        self.fetch_location()
+
+    @mainthread
+    def on_status(self, stype, status):
+        self.gps_status = 'type={}\n{}'.format(stype, status)
 
     def build(self):
         pass
