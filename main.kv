@@ -1,0 +1,222 @@
+#:import sm kivy.uix.screenmanager
+ScreenManager:
+    id:manager
+    transition:sm.FadeTransition(duration=.0)
+    MDScreen:
+        name:"home"
+        MDBottomNavigation:
+            id:bnav
+            #panel_color: 0, 0, 0, 1
+            MDBottomNavigationItem:
+                name: 'home'
+                text: 'main-schedules'
+                icon: 'map-marker-distance'
+                FloatLayout:
+                    Emergency:
+                        pos_hint:{"center_x":.5, "center_y":.95}
+                        call:"segment"
+                        name:"Routes"
+                        pos_y:.5
+                        pos_x:.15
+                    MDRaisedButton:
+                        text:app.prev_loc
+                        md_bg_color: 26/255, 54/255, 113/255, 1
+                        pos_hint:{"center_y":.6, "center_x":.5}
+                    MDSeparator:
+                        pos_hint:{"center_y":.5,"center_x":.5}
+                        orientation:"vertical"
+                        #color:150/255, 111/255, 51/255, 1
+                        width:2
+                        size_hint:None, .1
+                    MDRaisedButton:
+                        text:app.current_loc
+                        md_bg_color: 26/255, 54/255, 113/255, 1
+                        pos_hint:{"center_y":.4, "center_x":.5}
+                        on_release:
+                            app.category_sheet(app.bus_stops)
+
+
+            MDBottomNavigationItem:
+                name: 'room'
+                text: 'location'
+                icon: 'map-marker'
+                FloatLayout:
+                    MDIconButton:
+                        icon:"crosshairs-gps"
+                        pos_hint:{"center_x":.5,"center_y":.9}
+                        user_font_size:"55sp"
+                        theme_text_color: "Custom"
+                        md_bg_color:.35, .35, .35, 1
+                        text_color: 36/255, 146/255, 255/255, 1
+                        on_release:
+                            app.fetch_location()
+                    MDLabel:
+                        font_style:"Body1"
+                        text:"Start Monitoring"
+                        halign:"center"
+                        pos_hint:{"center_x":.5,"center_y":.83}
+                        font_name: 'components/fonts/Gill Sans.otf'
+                    Deco:
+                        pos_hint:{"center_x":.5,"center_y":.63}
+                        md_bg_color: .35, .35, .35, 1
+                        elevation: 7
+                        size: app.size_x/1.2, app.size_y/7
+                    MDSeparator:
+                        pos_hint:{"center_x":.45,"center_y":.64}
+                        orientation:"vertical"
+                        width:dp(1)
+                        size_hint: None, .1
+                        color:150/255, 111/255, 51/255, 1
+                    MDLabel:
+                        text:"Longitude:"
+                        halign:"center"
+                        font_size: "20sp"
+                        theme_text_color: "Custom"
+                        font_name: 'components/fonts/Gill Sans.otf'
+                        text_color: 1, 1, 1, 1
+                        pos_hint:{"center_x":.18,"center_y":.67}
+                    MDLabel:
+                        text:"Latitude:"
+                        halign:"center"
+                        font_size: "20sp"
+                        theme_text_color: "Custom"
+                        font_name: 'components/fonts/Gill Sans.otf'
+                        text_color: 1, 1, 1, 1
+                        pos_hint:{"center_x":.2,"center_y":.6}
+                    MDLabel:
+                        text:str(app.lat)
+                        halign:"center"
+                        font_size: "20sp"
+                        theme_text_color: "Custom"
+                        font_name: 'components/fonts/Gill Sans.otf'
+                        text_color: 1, 1, 1, 1
+                        pos_hint:{"center_x":.7,"center_y":.67}
+                    MDLabel:
+                        text:str(app.lon)
+                        halign:"center"
+                        font_size: "20sp"
+                        theme_text_color: "Custom"
+                        font_name: 'components/fonts/Gill Sans.otf'
+                        text_color: 1, 1, 1, 1
+                        pos_hint:{"center_x":.7,"center_y":.6}
+                    MDLabel:
+                        font_style:"Body1"
+                        text:"Note Location is updated after every 15min"
+                        halign:"center"
+                        pos_hint:{"center_x":.5,"center_y":.2}
+                        font_name: 'components/fonts/Gill Sans.otf'
+    MDScreen:
+        name:"add_stop"
+        MDBoxLayout:
+            orientation: "vertical"
+
+            MDToolbar:
+                title: "Location Manager"
+                specific_text_color:78/255, 82/255, 84/255, 1
+                md_bg_color:1, 1, 1, 1
+
+            MDTabs:
+                allow_stretch:False
+                background_color:1, 1, 1, 1
+                indicator_color:36/255, 146/255, 255/255, 1
+                tab_hint_x:True
+                text_color_active:78/255, 82/255, 84/255, 1
+                text_color_normal:.5, .5, .5, 1
+
+                Tab:
+                    title: "Add bus stop"
+                    FloatLayout:
+                        MDTextField:
+                            id:username
+                            mode: "rectangle"
+                            #fill_color: 0, 0, 0, .4
+                            size_hint: .6, .08
+                            pos_hint:{'center_x':.5, 'center_y':.7}
+                            hint_text:"location"
+                            #text_color: 1, 1, 1, 1
+                            font_size: dp(15)
+
+                        MDRaisedButton:
+                            text: "Add Bus Stop"
+                            pos_hint:{'center_x': .5, 'center_y': .45}
+                            font_size: "18sp"
+                            font_name: 'components/fonts/Gill Sans.otf'
+                            md_bg_color: 36/255, 146/255, 255/255, 1
+                            on_release:
+                                app.add_location(username.text)
+                                username.text = ""
+
+                Tab:
+                    title: "View Bus Stops"
+                    FloatLayout:
+                        RecycleView:
+                            id: stops
+                            key_viewclass: 'viewclass'
+                            key_size: 'height'
+                            pos_hint:{"center_x":.5,"top":.97}
+                            RecycleBoxLayout:
+                                id:wali
+                                spacing:dp(10)
+                                padding: dp(10)
+                                default_size: None, dp(55)
+                                default_size_hint: 1, None
+                                size_hint_y: None
+                                height: self.minimum_height
+                                orientation: 'vertical'
+
+<Deco@MDCard>:
+    orientation: "vertical"
+    md_bg_color: 1, 1, 1, 1
+    padding: "10dp"
+    #spacing: "5dp"
+    border_radius: 3
+    border_color_a: .5
+    radius: [9]
+    size_hint: None, None
+    size: app.size_x/1, app.size_y/3
+    focus_behavior: False
+    ripple_behavior: False
+<Emergency>:
+    radius:9
+    adaptive_height:True
+    name:""
+    icon:""
+    phone:""
+    call:"phone"
+    fsize: "20"
+    isize: "40sp"
+    pos_x: .27
+    pos_y: .64
+    height:dp(65)
+    md_bg_color:214/255, 223/255, 232/255, 1
+    #pos_hint:{"center_x":.5,"top":.8}
+    orientation:"vertical"
+    FloatLayout:
+        MDIcon:
+            icon:root.icon
+            font_size:root.isize
+            pos_hint:{"center_x":.53,"center_y":.5}
+        MDLabel:
+            id:nm
+            text:root.name
+            halign:"center"
+            font_size:root.fsize
+            theme_text_color: "Custom"
+            text_color:26/255, 54/255, 113/255
+            pos_hint:{"center_x":root.pos_x,"center_y":root.pos_y}
+        MDLabel:
+            text:root.phone
+            halign:"center"
+            font_size:"20sp"
+            font_style:"Caption"
+            theme_text_color: "Custom"
+            text_color:26/255, 54/255, 113/255
+            pos_hint:{"center_x":.27,"center_y":.32}
+        MDIconButton:
+            icon:root.call
+            font_size:"35sp"
+            pos_hint:{"center_x":.9,"center_y":.5}
+            on_release:
+                print(app.item)
+                if app.item: app.delete_location(root.name)
+                if not app.item: app.add_screen()
