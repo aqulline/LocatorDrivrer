@@ -20,12 +20,11 @@ def send_sms(phone_company, sms):
     URL = 'https://apisms.beem.africa/v1/send'
     content_type = 'application/json'
     source_addr = 'INFO'
-    #secrete_key = "ZGVmNWVkMzYxZmRhNWQ3MjM3NDhkMThmMWFkYzg4ZTM0ZGUwMjZmMGZjYTkzNWNkODRkMzFiMWJkZmM0M2JmYw=="
+    # secrete_key = "ZGVmNWVkMzYxZmRhNWQ3MjM3NDhkMThmMWFkYzg4ZTM0ZGUwMjZmMGZjYTkzNWNkODRkMzFiMWJkZmM0M2JmYw=="
     secrete_key = "YmE1NmRmNzVmY2JhN2RjYmI0ZGU1OTJlMzFlNWU4MDdhYzQ2MWNlNWVmZDVkNWFkNzYxOWUyNjRmNGNmYmNiNQ=="
-    #api_key = '8ccab9418dedde47'
+    # api_key = '8ccab9418dedde47'
     api_key = 'b7a0b864387611b6'
-    phonee = phone_repr(phone_company)
-    if phonee:
+    if phone_company:
         apikey_and_apisecret = api_key + ':' + secrete_key
 
         """sms = f'SHOPPY You have an order from{phone}, 
@@ -40,7 +39,7 @@ def send_sms(phone_company, sms):
             'recipients': [
                 {
                     'recipient_id': 1,
-                    'dest_addr': phonee,
+                    'dest_addr': phone_company,
                 }
             ],
         }),
