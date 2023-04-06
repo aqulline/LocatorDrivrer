@@ -1,9 +1,6 @@
-import json
-
-
 class FireBase:
 
-    def register_admin(self, phone):
+    def register_admin(self, busid, name):
         if True:
             import firebase_admin
             firebase_admin._apps.clear()
@@ -11,11 +8,11 @@ class FireBase:
             if not firebase_admin._apps:
                 cred = credentials.Certificate("credential/farmzon-abdcb-c4c57249e43b.json")
                 initialize_app(cred, {'databaseURL': 'https://farmzon-abdcb.firebaseio.com/'})
-                ref = db.reference('LocatorDriver').child("BusId").child(phone).child("Details")
+                ref = db.reference('LocatorDriver').child("BusId").child(busid).child("Details")
                 ref.set(
                     {
-                        "car_name": "Marangu Coach",
-                        "car_plate_number": "T657"
+                        "car_name": name,
+                        "car_plate_number": busid
                     }
                 )
 

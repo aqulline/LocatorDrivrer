@@ -1,3 +1,6 @@
+import os
+import re
+import threading
 import time
 
 from kivy.properties import DictProperty, NumericProperty, StringProperty, BooleanProperty
@@ -10,6 +13,7 @@ from kivymd.toast import toast
 from kivymd.uix.bottomsheet import MDListBottomSheet
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.tab import MDTabsBase
+from kivymd.uix.textfield import MDTextField
 from plyer import gps
 
 from database import Database as DT
@@ -20,6 +24,23 @@ Clock.max_iteration = 250
 
 if utils.platform != 'android':
     Window.size = (412, 732)
+
+
+class TNumberField(MDTextField):
+    pat = re.compile('[^0-9]')
+
+    def insert_text(self, substring, from_undo=False):
+
+        if len(self.text + substring) > 4:
+            return
+
+        if len(self.text) == 0 and substring != "T":
+            return
+
+        if len(self.text) > 0 and not substring.isdigit():
+            return
+
+        return super(TNumberField, self).insert_text(substring, from_undo=from_undo)
 
 
 class Emergency(MDBoxLayout):
@@ -53,10 +74,19 @@ class MainApp(MDApp):
     screens_size = NumericProperty(len(screens) - 1)
     current = StringProperty(screens[len(screens) - 1])
 
+    # USER
+    bus_name = StringProperty("")
+    bus_id = StringProperty("")
+    user_login = NumericProperty(0)
+
     def on_start(self):
+        Clock.schedule_once(self.optimize_app, .1)
+        self.gps_init()
+
+    def optimize_app(self, *kwargs):
+        self.call_look()
         self.add_bus()
         self.keyboard_hooker()
-        self.gps_init()
 
     def keyboard_hooker(self, *args):
         EventLoop.window.bind(on_keyboard=self.hook_keyboard)
@@ -145,8 +175,6 @@ class MainApp(MDApp):
 
         DT.data_loc(DT(), self.lat, self.lon)
 
-
-
     def add_screen(self):
         self.screen_capture("add_stop")
         self.item = True
@@ -175,6 +203,48 @@ class MainApp(MDApp):
         self.current = self.screens[len(self.screens) - 1]
         self.screen_capture(self.current)
 
+
+    def remember_me(self, name, busid):
+        with open("credential/admin.txt", "w") as fl:
+            fl.write(name + "\n")
+            fl.write(busid)
+            sm = self.root
+            sm.current = "home"
+        with open("credential/admin_info.txt", "w") as ui:
+            ui.write(name)
+        fl.close()
+        ui.close()
+        thread = threading.Thread(target=self.send_user, args=(busid, name))
+        thread.start()
+
+    def send_user(self, bus_id, name):
+        DT.register_user(DT(), bus_id, name)
+
+    def check_user(self):
+        print('hi')
+        if self.user_login == 0:
+            self.user_login = 1 + self.user_login
+            file1 = open('credential/admin.txt', 'r')
+            Lines = file1.readlines()
+            # Strips the newline character
+            self.bus_name = Lines[0].strip()
+            self.bus_id = Lines[1].strip()
+        else:
+            sm = self.root
+            sm.current = "home"
+
+    def call_look(self):
+        Clock.schedule_once(lambda x: self.look_up(), 0)
+
+    def look_up(self):
+        sm = self.root
+        file_size = os.path.getsize("credential/admin.txt")
+        if file_size == 0:
+            sm.current = "register"
+        else:
+            sm.current = "home"
+            thread = threading.Thread(target=self.check_user)
+            thread.start()
 
     def request_android_permissions(self):
         from android.permissions import request_permissions, Permission

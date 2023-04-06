@@ -3,6 +3,78 @@ ScreenManager:
     id:manager
     transition:sm.FadeTransition(duration=.0)
     MDScreen:
+        name:"register"
+        FloatLayout:
+            MDBoxLayout:
+                radius:10
+                height:240
+                size:330,320
+                md_bg_color:26/255, 54/255, 113/255, .9
+                adaptive_height:True
+                adaptive_width:True
+                pos_hint:{"center_x":.5, "center_y":.6}
+            Elip:
+                pos_hint:{"center_x":.5, "center_y":.9}
+            Elip:
+                pos_hint:{"center_x":.6, "center_y":.9}
+            Elip:
+                pos_hint:{"center_x":.54, "center_y":.93}
+                size:90, 50
+                radius:10
+
+            Car:
+                pos_hint:{"center_x":.54, "center_y":-.3}
+            Car:
+                pos_hint:{"center_x":.04, "center_y":-.2}
+            Car:
+                pos_hint:{"center_x":.8, "center_y":-.1}
+            Car:
+                pos_hint:{"center_x":.04, "center_y":.56}
+            MDLabel:
+                text:"Bus Name"
+                halign:"center"
+                font_size:"20sp"
+                pos_hint:{'center_x':.34, 'center_y':.77}
+                theme_text_color:"Custom"
+                text_color:211/255, 211/255, 211/255, 1
+            MDTextField:
+                id:busname
+                mode: "rectangle"
+                color_mode: 'custom'
+                hint_text:"marangu Coach"
+                line_color_focus: 1, 1, 1, 1
+                line_color_normal: app.theme_cls.accent_color
+                size_hint: .6, .08
+                pos_hint:{'center_x':.5, 'center_y':.7}
+                font_size: dp(25)
+            MDLabel:
+                text:"Plate Number"
+                halign:"center"
+                font_size:"19sp"
+                pos_hint:{'center_x':.48, 'center_y':.61}
+                theme_text_color:"Custom"
+                text_color:211/255, 211/255, 211/255, 1
+            TNumberField:
+                id:bus_id
+                mode: "rectangle"
+                color_mode: 'custom'
+                hint_text: "T123"
+                line_color_focus: 1, 1, 1, 1
+                line_color_normal: app.theme_cls.accent_color
+                size_hint: .3, .08
+                pos_hint:{'center_x':.5, 'center_y':.54}
+                font_size: dp(25)
+            MDRaisedButton:
+                text: "Register"
+                size_hint: None, None
+                size: dp(120), dp(60)
+                pos_hint: {'center_x': 0.5, 'center_y': 0.43}
+                md_bg_color: 1, 1, 1, 1
+                theme_text_color: "Custom"
+                text_color: 26/255, 54/255, 113/255, 1
+                on_release:
+                    app.remember_me(busname.text, bus_id.text)
+    MDScreen:
         name:"home"
         MDBottomNavigation:
             id:bnav
@@ -176,6 +248,26 @@ ScreenManager:
     size: app.size_x/1, app.size_y/3
     focus_behavior: False
     ripple_behavior: False
+
+<Elip@MDBoxLayout>:
+    radius:50
+    height:240
+    size:30,30
+    md_bg_color:26/255, 54/255, 113/255, .12
+    adaptive_height:True
+    adaptive_width:True
+<Car@MDBoxLayout>:
+    orientation:"vertical"
+    FloatLayout:
+        Elip:
+            pos_hint:{"center_x":.5, "center_y":.9}
+        Elip:
+            pos_hint:{"center_x":.6, "center_y":.9}
+        Elip:
+            pos_hint:{"center_x":.54, "center_y":.93}
+            size:90, 50
+            radius:10
+
 <Emergency>:
     radius:9
     adaptive_height:True
